@@ -1,0 +1,6 @@
+diff a/ToDoListClient/storage.txt b/ToDoListClient/storage.txt	(rejected hunks)
+@@ -0 +0 @@
+-[{"ToDoId":750,"ToDoLocalId":0,"UserId":98,"IsCompleted":false,"Name":"newTask                                                                                                                         "},{"ToDoId":783,"ToDoLocalId":1,"UserId":98,"IsCompleted":false,"Name":"new1                                                                                                                            "},{"ToDoId":784,"ToDoLocalId":2,"UserId":98,"IsCompleted":false,"Name":"new2                                                                                                                            "},{"ToDoId":786,"ToDoLocalId":3,"UserId":98,"IsCompleted":false,"Name":"new3                                                                                                                            "}]
+\ No newline at end of file
++[]
+\ No newline at end of file
