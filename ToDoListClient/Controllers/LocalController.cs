@@ -17,10 +17,6 @@ namespace ToDoListClient.Controllers
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
 
-
-
-        private static int counter = 0;
-
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
         private static List<int> updateIds = new List<int>();
@@ -62,15 +58,9 @@ namespace ToDoListClient.Controllers
         /// <param name="id">The todolocal-item to update.</param>
         public void Put(int id )
         {
-            if (counter == 1)
-            {
-                UpdateCloude();
-                counter = 0;
-            }
             listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted = !listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted;
             updateIds.Add(id);
             UpdateFile();
-            counter++;
         }
 
         /// <summary>
@@ -79,16 +69,10 @@ namespace ToDoListClient.Controllers
         /// <param name="id">The todolocal item identifier.</param>
         public void Delete(int id)
         {
-            if (counter == 2)
-            {
-                UpdateCloude();
-                counter = 0;
-            }
             var item = listOfItems.Find(m => m.ToDoLocalId == id);
             listOfItems.Remove(item);
             deleteId.Add(id);
             UpdateFile();
-            counter++;
         }
 
         /// <summary>
@@ -108,7 +92,6 @@ namespace ToDoListClient.Controllers
             ids.Add(listOfItems.Count - 1, null);
             UpdateFile();
         }
-
 
         private void UpdateFile()
         {
@@ -148,7 +131,6 @@ namespace ToDoListClient.Controllers
                     itemsInCloude = controller.Get();
                     ids[i] = itemsInCloude.Last().ToDoId;
                 }
-
                 
                 if (updateIds.Contains(i))
                 {
