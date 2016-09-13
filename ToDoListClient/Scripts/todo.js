@@ -31,10 +31,7 @@
     // @isCompleted: indicates if new task should be completed.
     // @name: name of new task.
     // @return a promise.
-    var createTask = function (isCompleted, name, taskId) {
-
-        localStorage.setObject(taskId, { name: name, isCompleted: isCompleted });
-        var t = localStorage.getObject(taskId);
+    var createTask = function (isCompleted, name) {
         return $.post("/api/local",
         {
             IsCompleted: isCompleted,
@@ -50,14 +47,14 @@
     var updateTask = function(id, isCompleted, name) {
         return $.ajax(
         {
-            url: "/api/local",
+            url: "/api/local/" + id,
             type: "PUT",
-            contentType: 'application/json',
-            data: JSON.stringify({
-                ToDoId: id,
-                IsCompleted: isCompleted,
-                Name: name
-            })
+            contentType: 'application/json'//,
+            //data: JSON.stringify({
+            //    ToDoId: id,
+            //    IsCompleted: isCompleted,
+            //    Name: name
+            //})
         });
     };
 
@@ -89,12 +86,7 @@ $(function () {
         var isCompleted = $('#newCompleted')[0].checked;
         var name = $('#newName')[0].value;
 
-        var taskBody = $("#tasks > tbody");
-        var firstParent = $("#tasks > tbody").parent();
-        var secondParent = firstParent.parent();
-        var taskId = taskBody.parent().parent().attr("data-id");
-
-        tasksManager.createTask(isCompleted, name, taskId)
+        tasksManager.createTask(isCompleted, name)
             .then(tasksManager.loadTasks)
             .done(function(tasks) {
                 tasksManager.displayTasks("#tasks > tbody", tasks);
