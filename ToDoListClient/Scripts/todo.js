@@ -108,6 +108,21 @@
 
 
 $(function () {
+    var store = new Storage();
+
+    // Add array to storage
+    var products = [
+        { name: "Fish", price: 2.33 },
+        { name: "Bacon", price: 1.33 }
+    ];
+    store.set("products", products);
+
+    // Retrieve items from storage
+    store.get("products").then(tasksManager.loadTasks)
+            .done(function (tasks) {
+                tasksManager.displayTasks("#tasks > tbody", tasks);
+            });
+
     // add new task button click handler
     $("#newCreate").click(function() {
         var isCompleted = $('#newCompleted')[0].checked;
@@ -155,3 +170,18 @@ $(function () {
             tasksManager.displayTasks("#tasks > tbody", tasks);
         });
 });
+
+function Storage() {
+
+    this.get = function (name) {
+        return JSON.parse(window.localStorage.getItem(name));
+    };
+
+    this.set = function (name, value) {
+        window.localStorage.setItem(name, JSON.stringify(value));
+    };
+
+    this.clear = function () {
+        window.localStorage.clear();
+    };
+}
