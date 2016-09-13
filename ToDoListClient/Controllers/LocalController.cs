@@ -17,13 +17,10 @@ namespace ToDoListClient.Controllers
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
 
-
-
-        private static int counter = 0;
-
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
         private static List<int> updateIds = new List<int>();
+        private static List<int> deleteId = new List<int>();
         private readonly string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.TrimEnd(@"Debug\\".ToCharArray()), "storage.txt");
 
         /// <summary>
@@ -61,15 +58,9 @@ namespace ToDoListClient.Controllers
         /// <param name="id">The todolocal-item to update.</param>
         public void Put(int id )
         {
-            if (counter == 1)
-            {
-                UpdateCloude();
-                counter = 0;
-            }
             listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted = !listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted;
             updateIds.Add(id);
             UpdateFile();
-            counter++;
         }
 
         /// <summary>
@@ -80,6 +71,7 @@ namespace ToDoListClient.Controllers
         {
             var item = listOfItems.Find(m => m.ToDoLocalId == id);
             listOfItems.Remove(item);
+            deleteId.Add(id);
             UpdateFile();
         }
 
@@ -101,7 +93,6 @@ namespace ToDoListClient.Controllers
             UpdateFile();
         }
 
-
         private void UpdateFile()
         {
             if (!File.Exists(storagePath))
@@ -122,10 +113,10 @@ namespace ToDoListClient.Controllers
             {
                 var item = itemsCash[i];
 
-                if (!itemsCash.Contains(item))
+                if (deleteId.Contains(i))
                 {
                     controller.Delete(item.ToDoId);
-                    break;
+                    continue;
                 }
 
                 if (ids[i] == null)
@@ -140,7 +131,6 @@ namespace ToDoListClient.Controllers
                     itemsInCloude = controller.Get();
                     ids[i] = itemsInCloude.Last().ToDoId;
                 }
-
                 
                 if (updateIds.Contains(i))
                 {
@@ -148,6 +138,7 @@ namespace ToDoListClient.Controllers
                 }
             }
             updateIds = new List<int>();
+            deleteId = new List<int>();
         }
     }
 }
