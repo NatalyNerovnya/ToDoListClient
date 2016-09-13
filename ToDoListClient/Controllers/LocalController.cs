@@ -24,6 +24,7 @@ namespace ToDoListClient.Controllers
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
         private static List<int> updateIds = new List<int>();
+        private static List<int> deleteId = new List<int>();
         private readonly string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.TrimEnd(@"Debug\\".ToCharArray()), "storage.txt");
 
         /// <summary>
@@ -78,9 +79,16 @@ namespace ToDoListClient.Controllers
         /// <param name="id">The todolocal item identifier.</param>
         public void Delete(int id)
         {
+            if (counter == 2)
+            {
+                UpdateCloude();
+                counter = 0;
+            }
             var item = listOfItems.Find(m => m.ToDoLocalId == id);
             listOfItems.Remove(item);
+            deleteId.Add(id);
             UpdateFile();
+            counter++;
         }
 
         /// <summary>
@@ -122,10 +130,10 @@ namespace ToDoListClient.Controllers
             {
                 var item = itemsCash[i];
 
-                if (!itemsCash.Contains(item))
+                if (deleteId.Contains(i))
                 {
                     controller.Delete(item.ToDoId);
-                    break;
+                    continue;
                 }
 
                 if (ids[i] == null)
@@ -148,6 +156,7 @@ namespace ToDoListClient.Controllers
                 }
             }
             updateIds = new List<int>();
+            deleteId = new List<int>();
         }
     }
 }
