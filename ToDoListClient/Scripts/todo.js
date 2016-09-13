@@ -4,7 +4,7 @@
     // @parentSelector: selector to append a row to.
     // @obj: task object to append.
     var appendRow = function(parentSelector, obj) {
-        var tr = $("<tr data-id='" + obj.ToDoId + "'></tr>");
+        var tr = $("<tr data-id='" + obj.ToDoLocalId + "'></tr>");
         tr.append("<td><input type='checkbox' class='completed' " + (obj.IsCompleted ? "checked" : "") + "/></td>");
         tr.append("<td class='name' >" + obj.Name + "</td>");
         tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
@@ -24,8 +24,7 @@
     // starts loading tasks from server.
     // @returns a promise.
     var loadTasks = function () {
-        var y = $.getJSON("/api/local");
-        return y;
+        return $.getJSON("/api/local");
     };
 
     // starts creating a task on the server.
