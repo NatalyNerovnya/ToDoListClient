@@ -10,6 +10,13 @@
         /// </value>
         public int ToDoId { get; set; }
 
+        /// <summary>
+        /// Gets or sets to do local identifier.
+        /// </summary>
+        /// <value>
+        /// To do local identifier.
+        /// </value>
+        public int ToDoLocalId { get; set; }
 
         /// <summary>
         /// Gets or sets the user identifier.

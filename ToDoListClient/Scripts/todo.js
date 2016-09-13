@@ -4,7 +4,7 @@
     // @parentSelector: selector to append a row to.
     // @obj: task object to append.
     var appendRow = function(parentSelector, obj) {
-        var tr = $("<tr data-id='" + obj.ToDoId + "'></tr>");
+        var tr = $("<tr data-id='" + obj.ToDoLocalId + "'></tr>");
         tr.append("<td><input type='checkbox' class='completed' " + (obj.IsCompleted ? "checked" : "") + "/></td>");
         tr.append("<td class='name' >" + obj.Name + "</td>");
         tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
@@ -24,8 +24,7 @@
     // starts loading tasks from server.
     // @returns a promise.
     var loadTasks = function () {
-        var y = $.getJSON("/api/todos");
-        return y;
+        return $.getJSON("/api/local");
     };
 
     // starts creating a task on the server.
@@ -36,7 +35,7 @@
 
         localStorage.setObject(taskId, { name: name, isCompleted: isCompleted });
         var t = localStorage.getObject(taskId);
-        return $.post("/api/todos",
+        return $.post("/api/local",
         {
             IsCompleted: isCompleted,
             Name: name
@@ -51,7 +50,7 @@
     var updateTask = function(id, isCompleted, name) {
         return $.ajax(
         {
-            url: "/api/todos",
+            url: "/api/local",
             type: "PUT",
             contentType: 'application/json',
             data: JSON.stringify({
@@ -67,30 +66,10 @@
     // @return a promise.
     var deleteTask = function (taskId) {
         return $.ajax({
-            url: "/api/todos/" + taskId,
+            url: "/api/local/" + taskId,
             type: 'DELETE'
         });
     };
-
-
-
-    ///////////////////////////////////////////////////////////
-    Storage.prototype.setObject = function (key, value) {
-        this.setItem(key, JSON.stringify(value));
-    };
-
-    Storage.prototype.getObject = function (key) {
-        var value = this.getItem(key);
-        return value && JSON.parse(value);
-    };
-
-
-    var loadToLocal = function () {
-        localStorage.setObject("itemsCollection", tasksManager.loadTasks());
-        var x = localStorage.getObject("itemsCollection");
-        displayTasks("#tasks > tbody", x);
-    };
-    //////////////////////////////////////////////////////////
 
     // returns public interface of task manager.
     return {
@@ -98,10 +77,7 @@
         displayTasks: displayTasks,
         createTask: createTask,
         deleteTask: deleteTask,
-        updateTask: updateTask,
-
-
-        loadToLocal: loadToLocal
+        updateTask: updateTask
     };
 
 }();
@@ -165,7 +141,7 @@ $(function () {
     });
 
     // load all tasks on startup
-    tasksManager.loadTasks().done(tasksManager.loadToLocal)
+    tasksManager.loadTasks().done(tasksManager.loadTasks)
         .then(function (tasks) {
             tasksManager.displayTasks("#tasks > tbody", tasks);
         });
