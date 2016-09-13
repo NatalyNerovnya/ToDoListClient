@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Web.Http;
 using Newtonsoft.Json;
 using ToDoListClient.Models;
@@ -16,8 +17,13 @@ namespace ToDoListClient.Controllers
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
 
+
+
+        private static int counter = 0;
+
         private static List<ToDoItemViewModel> listOfItems;
-        private static Dictionary<int, int?> ids;  
+        private static Dictionary<int?, int?> ids;
+        private static List<int> updateIds = new List<int>();
         private readonly string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.TrimEnd(@"Debug\\".ToCharArray()), "storage.txt");
 
         /// <summary>
@@ -30,7 +36,7 @@ namespace ToDoListClient.Controllers
             {
                 var userId = userService.GetOrCreateUser();
                 var items = todoService.GetItems(userId);
-                ids = new Dictionary<int, int?>();
+                ids = new Dictionary<int?, int?>();
                 listOfItems = new List<ToDoItemViewModel>();
                 foreach (var item in items)
                 {
@@ -44,25 +50,26 @@ namespace ToDoListClient.Controllers
                     });
                     ids.Add(listOfItems.Count - 1, item.ToDoId);
                 }
+                UpdateFile();
             }
-            if (!File.Exists(storagePath))
-            {
-                File.Create(storagePath).Close();
-            }
-            string json = JsonConvert.SerializeObject(listOfItems);
-            File.WriteAllText(storagePath, json);
             return listOfItems;
         }
 
         /// <summary>
         /// Updates the existing todolocal-item.
         /// </summary>
-        /// <param name="todo">The todolocal-item to update.</param>
-        public void Put(ToDoItemViewModel todo)
+        /// <param name="id">The todolocal-item to update.</param>
+        public void Put(int id )
         {
-            todo.UserId = userService.GetOrCreateUser();
-            listOfItems.Find(m => m.ToDoLocalId == todo.ToDoLocalId).IsCompleted = !todo.IsCompleted;
-            //todoService.UpdateItem(todo);
+            if (counter == 1)
+            {
+                UpdateCloude();
+                counter = 0;
+            }
+            listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted = !listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted;
+            updateIds.Add(id);
+            UpdateFile();
+            counter++;
         }
 
         /// <summary>
@@ -72,9 +79,8 @@ namespace ToDoListClient.Controllers
         public void Delete(int id)
         {
             var item = listOfItems.Find(m => m.ToDoLocalId == id);
-            ids[id] = null;
             listOfItems.Remove(item);
-            //todoService.DeleteItem(id);
+            UpdateFile();
         }
 
         /// <summary>
@@ -92,7 +98,56 @@ namespace ToDoListClient.Controllers
                 ToDoLocalId = listOfItems.Count
             });
             ids.Add(listOfItems.Count - 1, null);
-            //todoService.CreateItem(todo);
+            UpdateFile();
+        }
+
+
+        private void UpdateFile()
+        {
+            if (!File.Exists(storagePath))
+            {
+                File.Create(storagePath).Close();
+            }
+            string json = JsonConvert.SerializeObject(listOfItems);
+            File.WriteAllText(storagePath, json);
+        }
+        private void UpdateCloude()
+        {
+            var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
+            var itemsCash = listOfItems.ToArray();
+            ToDosController controller = new ToDosController();
+            var itemsInCloude = controller.Get();
+
+            for (int i = 0; i < listOfItems.Count; i++)
+            {
+                var item = itemsCash[i];
+
+                if (!itemsCash.Contains(item))
+                {
+                    controller.Delete(item.ToDoId);
+                    break;
+                }
+
+                if (ids[i] == null)
+                {
+                    controller.Post(new ToDoItemViewModel()
+                    {
+                        Name = item.Name,
+                        IsCompleted = item.IsCompleted,
+                        ToDoLocalId = i,
+                        UserId = item.UserId
+                    });
+                    itemsInCloude = controller.Get();
+                    ids[i] = itemsInCloude.Last().ToDoId;
+                }
+
+                
+                if (updateIds.Contains(i))
+                {
+                    controller.Put(item);
+                }
+            }
+            updateIds = new List<int>();
         }
     }
 }
