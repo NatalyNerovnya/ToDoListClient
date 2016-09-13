@@ -23,15 +23,19 @@
 
     // starts loading tasks from server.
     // @returns a promise.
-    var loadTasks = function() {
-        return $.getJSON("/api/todos");
+    var loadTasks = function () {
+        var y = $.getJSON("/api/todos");
+        return y;
     };
 
     // starts creating a task on the server.
     // @isCompleted: indicates if new task should be completed.
     // @name: name of new task.
     // @return a promise.
-    var createTask = function(isCompleted, name) {
+    var createTask = function (isCompleted, name, taskId) {
+
+        localStorage.setObject(taskId, { name: name, isCompleted: isCompleted });
+        var t = localStorage.getObject(taskId);
         return $.post("/api/todos",
         {
             IsCompleted: isCompleted,
@@ -68,14 +72,38 @@
         });
     };
 
+
+
+    ///////////////////////////////////////////////////////////
+    Storage.prototype.setObject = function (key, value) {
+        this.setItem(key, JSON.stringify(value));
+    };
+
+    Storage.prototype.getObject = function (key) {
+        var value = this.getItem(key);
+        return value && JSON.parse(value);
+    };
+
+
+    var loadToLocal = function () {
+        localStorage.setObject("itemsCollection", tasksManager.loadTasks());
+        var x = localStorage.getObject("itemsCollection");
+        displayTasks("#tasks > tbody", x);
+    };
+    //////////////////////////////////////////////////////////
+
     // returns public interface of task manager.
     return {
         loadTasks: loadTasks,
         displayTasks: displayTasks,
         createTask: createTask,
         deleteTask: deleteTask,
-        updateTask: updateTask
+        updateTask: updateTask,
+
+
+        loadToLocal: loadToLocal
     };
+
 }();
 
 
@@ -85,7 +113,12 @@ $(function () {
         var isCompleted = $('#newCompleted')[0].checked;
         var name = $('#newName')[0].value;
 
-        tasksManager.createTask(isCompleted, name)
+        var taskBody = $("#tasks > tbody");
+        var firstParent = $("#tasks > tbody").parent();
+        var secondParent = firstParent.parent();
+        var taskId = taskBody.parent().parent().attr("data-id");
+
+        tasksManager.createTask(isCompleted, name, taskId)
             .then(tasksManager.loadTasks)
             .done(function(tasks) {
                 tasksManager.displayTasks("#tasks > tbody", tasks);
@@ -117,8 +150,8 @@ $(function () {
     });
 
     // load all tasks on startup
-    tasksManager.loadTasks()
-        .done(function(tasks) {
+    tasksManager.loadTasks().done(tasksManager.loadToLocal)
+        .then(function (tasks) {
             tasksManager.displayTasks("#tasks > tbody", tasks);
         });
 });
