@@ -7,7 +7,8 @@
         var tr = $("<tr data-id='" + obj.ToDoLocalId + "'></tr>");
         tr.append("<td><input type='checkbox' class='completed' " + (obj.IsCompleted ? "checked" : "") + "/></td>");
         tr.append("<td class='name' >" + obj.Name + "</td>");
-        tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
+        //tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
+        tr.append("<button type='button' class='btn btn-primary.delete-button'>Delete</button>");
         $(parentSelector).append(tr);
     }
 
@@ -84,20 +85,20 @@
 
 
 $(function () {
-    var store = new Storage();
+    //var store = new Storage();
 
-    // Add array to storage
-    var products = [
-        { name: "Fish", price: 2.33 },
-        { name: "Bacon", price: 1.33 }
-    ];
-    store.set("products", products);
+    //// Add array to storage
+    //var products = [
+    //    { name: "Fish", price: 2.33 },
+    //    { name: "Bacon", price: 1.33 }
+    //];
+    //store.set("products", products);
 
-    // Retrieve items from storage
-    store.get("products").then(tasksManager.loadTasks)
-            .done(function (tasks) {
-                tasksManager.displayTasks("#tasks > tbody", tasks);
-            });
+    //// Retrieve items from storage
+    //store.get("products").then(tasksManager.loadTasks)
+    //        .done(function (tasks) {
+    //            tasksManager.displayTasks("#tasks > tbody", tasks);
+    //        });
 
     // add new task button click handler
     $("#newCreate").click(function() {
@@ -147,17 +148,17 @@ $(function () {
         });
 });
 
-function Storage() {
+//function Storage() {
 
-    this.get = function (name) {
-        return JSON.parse(window.localStorage.getItem(name));
-    };
+//    this.get = function (name) {
+//        return JSON.parse(window.localStorage.getItem(name));
+//    };
 
-    this.set = function (name, value) {
-        window.localStorage.setItem(name, JSON.stringify(value));
-    };
+//    this.set = function (name, value) {
+//        window.localStorage.setItem(name, JSON.stringify(value));
+//    };
 
-    this.clear = function () {
-        window.localStorage.clear();
-    };
-}
+//    this.clear = function () {
+//        window.localStorage.clear();
+//    };
+//}
