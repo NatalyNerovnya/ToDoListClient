@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
 using ToDoListClient.Models;
@@ -102,7 +103,7 @@ namespace ToDoListClient.Controllers
             string json = JsonConvert.SerializeObject(listOfItems);
             File.WriteAllText(storagePath, json);
         }
-        private void UpdateCloude()
+        public void UpdateCloude()
         {
             var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
             var itemsCash = listOfItems.ToArray();
@@ -140,5 +141,7 @@ namespace ToDoListClient.Controllers
             updateIds = new List<int>();
             deleteId = new List<int>();
         }
+
+        //private async Task UpdateCloudeAsync
     }
 }

@@ -69,13 +69,20 @@
         });
     };
 
+    var updateCloude = function() {
+        return $.ajax({
+        //$.ajax({
+            url: "/api/local/UPDATECLOUDE"
+        });
+    }
     // returns public interface of task manager.
     return {
         loadTasks: loadTasks,
         displayTasks: displayTasks,
         createTask: createTask,
         deleteTask: deleteTask,
-        updateTask: updateTask
+        updateTask: updateTask,
+        updateCloude: updateCloude
     };
 
 }();
@@ -138,6 +145,8 @@ $(function () {
         .then(function (tasks) {
             tasksManager.displayTasks("#tasks > tbody", tasks);
         });
+
+    setInterval(tasksManager.updateCloude, 20000);
 });
 
 //function Storage() {
