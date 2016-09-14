@@ -32,7 +32,16 @@ namespace ToDoListClient.Controllers
             if (listOfItems == null)
             {
                 var userId = userService.GetOrCreateUser();
-                var items = todoService.GetItems(userId);
+                IList<ToDoItemViewModel> items;
+                if(!File.Exists(storagePath))
+                {
+                    items = todoService.GetItems(userId);
+                }
+                else
+                {
+                    items = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(File.ReadAllText(storagePath));
+                }
+                
                 ids = new Dictionary<int?, int?>();
                 listOfItems = new List<ToDoItemViewModel>();
                 foreach (var item in items)
