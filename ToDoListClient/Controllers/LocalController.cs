@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
 using ToDoListClient.Models;
@@ -57,7 +56,7 @@ namespace ToDoListClient.Controllers
         /// Updates the existing todolocal-item.
         /// </summary>
         /// <param name="id">The todolocal-item to update.</param>
-        public void Put(int id )
+        public void Put(int id)
         {
             listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted = !listOfItems.Find(m => m.ToDoLocalId == id).IsCompleted;
             updateIds.Add(id);
@@ -86,7 +85,7 @@ namespace ToDoListClient.Controllers
             listOfItems.Add(new ToDoItemViewModel()
             {
                 Name = todo.Name,
-                IsCompleted =  todo.IsCompleted,
+                IsCompleted = todo.IsCompleted,
                 UserId = todo.UserId,
                 ToDoLocalId = listOfItems.Count
             });
@@ -94,6 +93,9 @@ namespace ToDoListClient.Controllers
             UpdateFile();
         }
 
+        /// <summary>
+        /// Update file in memory
+        /// </summary>
         private void UpdateFile()
         {
             if (!File.Exists(storagePath))
@@ -103,7 +105,11 @@ namespace ToDoListClient.Controllers
             string json = JsonConvert.SerializeObject(listOfItems);
             File.WriteAllText(storagePath, json);
         }
-        public void UpdateCloude()
+
+        /// <summary>
+        /// Uploud data
+        /// </summary>
+        private void UpdateCloude()
         {
             var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
             var itemsCash = listOfItems.ToArray();
@@ -132,7 +138,7 @@ namespace ToDoListClient.Controllers
                     itemsInCloude = controller.Get();
                     ids[i] = itemsInCloude.Last().ToDoId;
                 }
-                
+
                 if (updateIds.Contains(i))
                 {
                     controller.Put(item);
@@ -141,7 +147,5 @@ namespace ToDoListClient.Controllers
             updateIds = new List<int>();
             deleteId = new List<int>();
         }
-
-        //private async Task UpdateCloudeAsync
     }
 }
