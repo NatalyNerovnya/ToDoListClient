@@ -31,33 +31,9 @@ namespace ToDoListClient.Controllers
         {
             if (listOfItems == null)
             {
-                var userId = userService.GetOrCreateUser();
-                IList<ToDoItemViewModel> items;
-                if(!File.Exists(storagePath))
-                {
-                    items = todoService.GetItems(userId);
-                }
-                else
-                {
-                    items = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(File.ReadAllText(storagePath));
-                }
-                
-                ids = new Dictionary<int?, int?>();
-                listOfItems = new List<ToDoItemViewModel>();
-                foreach (var item in items)
-                {
-                    listOfItems.Add(new ToDoItemViewModel()
-                    {
-                        Name = item.Name,
-                        IsCompleted = item.IsCompleted,
-                        ToDoId = item.ToDoId,
-                        UserId = item.UserId,
-                        ToDoLocalId = listOfItems.Count
-                    });
-                    ids.Add(listOfItems.Count - 1, item.ToDoId);
-                }
-                UpdateFile();
+                CreateLocalList();
             }
+            UpdateFile();
             return listOfItems;
         }
 
@@ -113,6 +89,38 @@ namespace ToDoListClient.Controllers
             }
             string json = JsonConvert.SerializeObject(listOfItems);
             File.WriteAllText(storagePath, json);
+        }
+
+        /// <summary>
+        /// Create list from cloude or file
+        /// </summary>
+        private void CreateLocalList()
+        {
+            IList<ToDoItemViewModel> items;
+            var userId = userService.GetOrCreateUser();
+            if (!File.Exists(storagePath))
+            {
+                items = todoService.GetItems(userId);
+            }
+            else
+            {
+                items = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(File.ReadAllText(storagePath));
+            }
+
+            ids = new Dictionary<int?, int?>();
+            listOfItems = new List<ToDoItemViewModel>();
+            foreach (var item in items)
+            {
+                listOfItems.Add(new ToDoItemViewModel()
+                {
+                    Name = item.Name,
+                    IsCompleted = item.IsCompleted,
+                    ToDoId = item.ToDoId,
+                    UserId = item.UserId,
+                    ToDoLocalId = listOfItems.Count
+                });
+                ids.Add(listOfItems.Count - 1, item.ToDoId);
+            }
         }
 
         /// <summary>
