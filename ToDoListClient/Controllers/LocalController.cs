@@ -6,6 +6,7 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using ToDoListClient.Models;
 using ToDoListClient.Services;
+using System.Threading.Tasks;
 
 namespace ToDoListClient.Controllers
 {
@@ -16,6 +17,7 @@ namespace ToDoListClient.Controllers
     {
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
+
 
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
@@ -31,33 +33,9 @@ namespace ToDoListClient.Controllers
         {
             if (listOfItems == null)
             {
-                var userId = userService.GetOrCreateUser();
-                IList<ToDoItemViewModel> items;
-                if(!File.Exists(storagePath))
-                {
-                    items = todoService.GetItems(userId);
-                }
-                else
-                {
-                    items = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(File.ReadAllText(storagePath));
-                }
-                
-                ids = new Dictionary<int?, int?>();
-                listOfItems = new List<ToDoItemViewModel>();
-                foreach (var item in items)
-                {
-                    listOfItems.Add(new ToDoItemViewModel()
-                    {
-                        Name = item.Name,
-                        IsCompleted = item.IsCompleted,
-                        ToDoId = item.ToDoId,
-                        UserId = item.UserId,
-                        ToDoLocalId = listOfItems.Count
-                    });
-                    ids.Add(listOfItems.Count - 1, item.ToDoId);
-                }
-                UpdateFile();
+                CreateLocalList();
             }
+            UpdateFile();
             return listOfItems;
         }
 
@@ -105,7 +83,7 @@ namespace ToDoListClient.Controllers
         /// <summary>
         /// Update file in memory
         /// </summary>
-        private void UpdateFile()
+        private async void UpdateFile()
         {
             if (!File.Exists(storagePath))
             {
@@ -116,9 +94,41 @@ namespace ToDoListClient.Controllers
         }
 
         /// <summary>
-        /// Uploud data
+        /// Create list from cloude or file
         /// </summary>
-        private void UpdateCloude()
+        private void CreateLocalList()
+        {
+            IList<ToDoItemViewModel> items;
+            var userId = userService.GetOrCreateUser();
+            if (!File.Exists(storagePath))
+            {
+                items = todoService.GetItems(userId);
+            }
+            else
+            {
+                items = JsonConvert.DeserializeObject<IList<ToDoItemViewModel>>(File.ReadAllText(storagePath));
+            }
+
+            ids = new Dictionary<int?, int?>();
+            listOfItems = new List<ToDoItemViewModel>();
+            foreach (var item in items)
+            {
+                listOfItems.Add(new ToDoItemViewModel()
+                {
+                    Name = item.Name,
+                    IsCompleted = item.IsCompleted,
+                    ToDoId = item.ToDoId,
+                    UserId = item.UserId,
+                    ToDoLocalId = listOfItems.Count
+                });
+                ids.Add(listOfItems.Count - 1, item.ToDoId);
+            }
+        }
+
+        /// <summary>
+        /// Uploud data async
+        /// </summary>
+        private async Task UpdateCloude()
         {
             var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
             var itemsCash = listOfItems.ToArray();
