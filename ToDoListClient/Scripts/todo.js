@@ -7,7 +7,7 @@
         var tr = $("<tr data-id='" + obj.ToDoLocalId + "'></tr>");
         tr.append("<td><input type='checkbox' class='completed' " + (obj.IsCompleted ? "checked" : "") + "/></td>");
         tr.append("<td class='name' >" + obj.Name + "</td>");
-        tr.append("<td><input type='button' class='delete-button' value='Delete' /></td>");
+        tr.append("<td><input type='button' class='delete-button btn-warning' value='Delete' /></td>");
         $(parentSelector).append(tr);
     }
 

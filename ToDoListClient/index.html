@@ -5,26 +5,45 @@
     <meta charset="utf-8" />
 
     <link rel="stylesheet" type="text/css" href="Styles/site.css">
+    <link rel="stylesheet" type="text/css" href="Content/bootstrap.css">
 
     <script src="Scripts/jquery-3.1.0.js" language="javascript"></script>
     <script src="Scripts/todo.js" language="javascript"></script>
 </head>
 <body>
-    <table id="tasks">
-        <thead>
-            <tr>
-                <th>Completed</th>
-                <th>Task</th>
-                <th>Actions</th>
-            </tr>
-            <!-- The row for creating new items. -->
-            <tr id="new">
-                <td><input type='checkbox' id="newCompleted" /></td>
-                <td><input type='text' id="newName" /></td>
-                <td><input type='button' id="newCreate" value='Create' /></td>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="navbar navbar-inverse" role="navigation">
+        <a class="navbar-brand" href="#">
+            <span class="hidden-xs">List To Do - mini project</span>
+        </a>
+
+        <div class="navbar-right">
+            <div class="btn btn-default navbar-btn">
+
+                <span class="glyphicon glyphicon-shopping-cart"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6" >
+            <table id="tasks" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Completed</th>
+                        <th>Task</th>
+                        <th>Actions</th>
+                    </tr>
+                    <!-- The row for creating new items. -->
+                    <tr id="new">
+                        <td><input type='checkbox' id="newCompleted" /></td>
+                        <td><input type='text' id="newName" /></td>
+                        <td><input type='button' id="newCreate" value='Create' class="btn-primary" /></td><!-- Only in td with button text-align: center -->
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            </div>
+        <div class="col-md-3"></div>
+        </div>
 </body>
 </html>
