@@ -6,6 +6,7 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using ToDoListClient.Models;
 using ToDoListClient.Services;
+using System.Threading.Tasks;
 
 namespace ToDoListClient.Controllers
 {
@@ -16,6 +17,7 @@ namespace ToDoListClient.Controllers
     {
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
+
 
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
@@ -81,7 +83,7 @@ namespace ToDoListClient.Controllers
         /// <summary>
         /// Update file in memory
         /// </summary>
-        private void UpdateFile()
+        private async void UpdateFile()
         {
             if (!File.Exists(storagePath))
             {
@@ -124,9 +126,9 @@ namespace ToDoListClient.Controllers
         }
 
         /// <summary>
-        /// Uploud data
+        /// Uploud data async
         /// </summary>
-        private void UpdateCloude()
+        private async Task UpdateCloude()
         {
             var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
             var itemsCash = listOfItems.ToArray();
