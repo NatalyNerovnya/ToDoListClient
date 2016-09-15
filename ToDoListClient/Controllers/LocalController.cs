@@ -15,18 +15,15 @@ namespace ToDoListClient.Controllers
     /// </summary>
     public class LocalController : ApiController
     {
-        #region Private fileds
         private readonly ToDoService todoService = new ToDoService();
         private readonly UserService userService = new UserService();
-        private static int counter = 0;
+
         private static List<ToDoItemViewModel> listOfItems;
         private static Dictionary<int?, int?> ids;
         private static List<int> updateIds = new List<int>();
         private static List<int> deleteId = new List<int>();
         private readonly string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory.TrimEnd(@"Debug\\".ToCharArray()), "storage.txt");
-        #endregion
 
-        #region Public methods
         /// <summary>
         /// Returns all todolocal-items for the current user.
         /// </summary>
@@ -36,8 +33,9 @@ namespace ToDoListClient.Controllers
             if (listOfItems == null)
             {
                 CreateLocalList();
+                UpdateFile();
             }
-            UpdateFile();
+            
             return listOfItems;
         }
 
@@ -79,28 +77,22 @@ namespace ToDoListClient.Controllers
                 UserId = todo.UserId,
                 ToDoLocalId = listOfItems.Count
             });
-            ids.Add(listOfItems.Count - 1, null);
+            ids.Add(ids.Last().Key + 1, null);
             UpdateFile();
         }
-        #endregion
 
-        #region Private methods
         /// <summary>
         /// Update file in memory
         /// </summary>
-        private async void UpdateFile()
+        private void UpdateFile()
         {
-            counter++;
             if (!File.Exists(storagePath))
             {
                 File.Create(storagePath).Close();
             }
             string json = JsonConvert.SerializeObject(listOfItems);
-            if (counter == 100)
-            {
-                await UpdateCloude();
-            }
             File.WriteAllText(storagePath, json);
+           
         }
 
         /// <summary>
@@ -138,7 +130,7 @@ namespace ToDoListClient.Controllers
         /// <summary>
         /// Uploud data async
         /// </summary>
-        private async Task UpdateCloude()
+        private void UpdateCloude()
         {
             var dictionaryCash = ids.ToDictionary(k => k.Key, v => v.Value);
             var itemsCash = listOfItems.ToArray();
@@ -176,7 +168,5 @@ namespace ToDoListClient.Controllers
             updateIds = new List<int>();
             deleteId = new List<int>();
         }
-        #endregion
-
     }
 }

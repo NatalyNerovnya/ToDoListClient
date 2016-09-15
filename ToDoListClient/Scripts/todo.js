@@ -72,8 +72,6 @@
         });
     };
 
-    
-
     // returns public interface of task manager.
     return {
         loadTasks: loadTasks,
@@ -95,11 +93,8 @@ $(function () {
         tasksManager.createTask(isCompleted, name)
             .then(tasksManager.loadTasks)
             .done(function (tasks) {
-                tasksManager.displayTasks("#tasks > tbody", tasks)
-            ;
+                tasksManager.displayTasks("#tasks > tbody", tasks);
             });
-
-        
     });
 
     // bind update task checkbox click handler
